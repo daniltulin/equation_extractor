@@ -101,13 +101,13 @@ class Model:
             self.build_dependencies(output)
         return self
 
-    def build_dependencies(self, node, depth=0):
+    def build_dependencies(self, node):
         if node.name in self.inputs:
             return
         gate = self.logic_gates[node.name]
         node.dep = gate
         for input_node in gate.input_nodes:
-            self.build_dependencies(input_node, depth + 1)
+            self.build_dependencies(input_node)
 
 class Extractor:
     def parse(self, text):
