@@ -116,5 +116,5 @@ class Extractor:
     def extract(self, variable):
         outputs = self.model.outputs
         if not variable in outputs:
-            raise Error('{} is not output variable'.format(variable))
+            raise Exception('{} is not output variable'.format(variable))
         return str(outputs[variable])
