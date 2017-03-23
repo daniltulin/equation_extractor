@@ -15,6 +15,6 @@ for file in files:
         except: pass
 print(qty)
 
-with open('b1.blif') as f:
+with open('blifs/b1.blif') as f:
     e.parse(f.read())
     print(e.extract('pf'))
