@@ -1,2 +1,2 @@
-from .Extractor import Extractor
+from .extractor import Extractor
 __all__ = ['Extractor']
