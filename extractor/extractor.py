@@ -20,25 +20,27 @@ class Extractor:
                 regexps[name] = regexp
 
         define('word', r'\w+')
-        define('wht', r'[ ]{1,2}', False)
+        define('w', r'[ ]{1,2}', False)
 
         # Header
-        define('declaration', r'\.model{wht}{word}')
-        define('inputs', r'\.inputs{wht}{word}({wht}{word})*')
-        define('outputs', r'\.outputs{wht}{word}({wht}{word})*')
+        define('declaration', r'\.model{wht}{w}')
+        define('inputs', r'\.inputs{wht}{w}({wht}{w})*')
+        define('outputs', r'\.outputs{wht}{w}({wht}{w})*')
 
         define('header', r'{declaration}\n{inputs}\n{outputs}\n')
 
         # Body
+        define('gate_header', r'\.names{wht}{w}({wht}{w})*')
         define('mask', r'([01-]+{wht}[01]\n)+')
-        define('gate_header', r'\.names{wht}{word}({wht}{word})*')
         define('logic_gate', r'{gate_header}\n{mask}')
 
-        define('assignment', r'{word}={word}')
+        define('assignment', r'{w}={w}')
         define('formal_list', r'{assignment}({wht}{assignment})*')
-        define('library_gate', r'\.gate{wht}{word}{wht}{formal_list}\n')
+        define('library_gate', r'\.gate{wht}{w}{wht}{formal_list}\n')
 
-        define('body', r'(({logic_gate})|({library_gate}))+')
+        define('latch', r'\.latch{wht}{w}{wht}{w}{wht}re{wht}{w}{wht}2\n')
+
+        define('body', r'(({logic_gate})|({latch}))+')
 
         # End
         define('end', r'\.end')
@@ -46,20 +48,20 @@ class Extractor:
         # Whole blif file
         define('model', r'{header}{body}{end}')
         define('blif', r'({model}\n)*{model}')
-        blif_regexp = compile(regexps['blif'])
+        blif_regexp = compile(get('blif'))
 
         def fail(err=''):
             unsprrt_err = 'Unsupported blif format: '
             raise Exception(unsprrt_err + err)
 
         if fullmatch(blif_regexp, filtered_text) is None:
-            fail()
+            fail('Doesn\'t match regular expression')
 
         models = {}
         for model_text in without_emptys(filtered_text.split('.end')):
             model = Model().parse(model_text.strip())
             if model.name in models:
-                fail('File con')
+                fail('File has two or models with the same name: ' + mode.name)
             models[model.name] = model
         self.models = models
 
