@@ -12,5 +12,8 @@ for file in files:
         try:
             e.parse(f.read())
             qty += 1
-        except: pass
+        except KeyboardInterrupt:
+            break
+        except:
+            print(file)
 print(qty)
