@@ -14,19 +14,30 @@ class Model:
 
         # Take components of blif file
         model_name, input_token, output_token = lines[0:3]
-        content = '\n'.join(lines[3:])
+        content = lines[3:]
 
         self.name = model_name.split()[1]
-
         # Inputs and outputs section
-        _, input_names = input_token.split('.inputs')
+        _, input_names_text = input_token.split('.inputs')
+        input_names = input_names_text.split()
+
         _, output_names = output_token.split('.outputs')
 
-        self.inputs = {name: Node(name) for name in input_names.split()}
         self.outputs = {name: Node(name) for name in output_names.split()}
 
         # Content section
-        text_logic_gates = without_emptys(content.split('.names '))
+        # Latchs
+        is_latch = lambda line: line.split()[0] == '.latch'
+        is_logic_gate = lambda line: not is_latch(line)
+
+        latchs = [line for line in content if is_latch(line)]
+        latch_output_name = lambda l: l.split()[2]
+        input_names += [latch_output_name(l) for l in latchs]
+        self.inputs = {name: Node(name) for name in input_names}
+
+        # Logic Gates
+        reminder = [l for l in content if is_logic_gate(l)]
+        text_logic_gates = without_emptys('\n'.join(reminder).split('.names '))
         logic_gates = [LogicGate().parse(t) for t in text_logic_gates]
 
         self.logic_gates = {gate.output_name: gate for gate in logic_gates}
