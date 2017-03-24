@@ -1,12 +1,10 @@
 from re import compile, fullmatch
+from .utils import without_emptys
 
 from .model import Model
 from .logicgate import LogicGate
 
 class Extractor:
-    def __init__(self):
-        self.model = None
-
     def parse(self, raw_text):
         # Filter lines
         is_valid = lambda l: len(l) > 0 and l[0] != '#'
@@ -14,34 +12,65 @@ class Extractor:
                                   if is_valid(line)]
         filtered_text = '\n'.join(lines_without_comments)
 
-        # Header
-        declaration = r'\.model \w+'
-        inputs = r'\.inputs \w+( \w+)*'
-        outputs = r'\.outputs \w+( \w+)*'
+        regexps = {}
+        def define(name, regexp, wrap=True):
+            if wrap:
+                regexps[name] = regexp.format(**regexps)
+            else:
+                regexps[name] = regexp
 
-        header = r'{}\n'.format('\n'.join([declaration, inputs, outputs]))
+        define('word', r'\w+')
+        define('wht', r'[ ]{1,2}', False)
+
+        # Header
+        define('declaration', r'\.model{wht}{word}')
+        define('inputs', r'\.inputs{wht}{word}({wht}{word})*')
+        define('outputs', r'\.outputs{wht}{word}({wht}{word})*')
+
+        define('header', r'{declaration}\n{inputs}\n{outputs}\n')
 
         # Body
-        mask = r'([01-]+  [01]\n)+'
-        logic_gate_header = r'\.names \w+([ ]{1,2}\w+)*'
-        logic_gate = r'{}\n{}'.format(logic_gate_header, mask)
+        define('mask', r'([01-]+{wht}[01]\n)+')
+        define('gate_header', r'\.names{wht}{word}({wht}{word})*')
+        define('logic_gate', r'{gate_header}\n{mask}')
 
-        body = r'({})+'.format(logic_gate)
+        define('assignment', r'{word}={word}')
+        define('formal_list', r'{assignment}({wht}{assignment})*')
+        define('library_gate', r'\.gate{wht}{word}{wht}{formal_list}\n')
+
+        define('body', r'(({logic_gate})|({library_gate}))+')
 
         # End
-        end = r'\.end'
+        define('end', r'\.end')
 
         # Whole blif file
-        model = r'{}{}{}'.format(header, body, end)
-        blif_regex = compile(r'({0}\n)*{0}'.format(model))
-        if fullmatch(blif_regex, filtered_text) is None:
-                raise Exception('Unsupported blif format')
+        define('model', r'{header}{body}{end}')
+        define('blif', r'({model}\n)*{model}')
+        blif_regexp = compile(regexps['blif'])
 
-        self.model = Model().parse(filtered_text)
+        def fail(err=''):
+            unsprrt_err = 'Unsupported blif format: '
+            raise Exception(unsprrt_err + err)
+
+        if fullmatch(blif_regexp, filtered_text) is None:
+            fail()
+
+        models = {}
+        for model_text in without_emptys(filtered_text.split('.end')):
+            model = Model().parse(model_text.strip())
+            if model.name in models:
+                fail('File con')
+            models[model.name] = model
+        self.models = models
+
         return self
 
-    def extract(self, variable):
-        outputs = self.model.outputs
-        if not variable in outputs:
-            raise Exception('{} is not output variable'.format(variable))
-        return str(outputs[variable])
+    def extract(self, name, node):
+        return '{} = '.format(name) + str(node)
+
+    def extract_all(self):
+        result = ''
+        for model in self.models.values():
+            result += '\n'.join([self.extract(model.name + '.' + name, node)
+                                 for name, node in model.outputs.items()])
+        return result
