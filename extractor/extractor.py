@@ -35,7 +35,7 @@ class Extractor:
         # Body
         define('gate_header', r'\.names({wht}{w})+')
         define('mask_with_input', r'(([01-])+{wht}[01]\n)')
-        define('mask', r'(({mask_with_input})+|{wht}[01]\n)')
+        define('mask', r'(({mask_with_input})+|{wht}[01-]\n)')
         define('logic_gate', r'{gate_header}\n{mask}')
 
         define('assignment', r'{w}={w}')
