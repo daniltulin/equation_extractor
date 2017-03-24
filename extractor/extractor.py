@@ -19,8 +19,8 @@ class Extractor:
             else:
                 regexps[name] = regexp
 
-        define('word', r'\w+')
-        define('w', r'[ ]{1,2}', False)
+        define('w', r'\w+')
+        define('wht', r'[ ]{1,2}', False)
 
         # Header
         define('declaration', r'\.model{wht}{w}')
@@ -48,7 +48,7 @@ class Extractor:
         # Whole blif file
         define('model', r'{header}{body}{end}')
         define('blif', r'({model}\n)*{model}')
-        blif_regexp = compile(get('blif'))
+        blif_regexp = compile(regexps['blif'])
 
         def fail(err=''):
             unsprrt_err = 'Unsupported blif format: '
