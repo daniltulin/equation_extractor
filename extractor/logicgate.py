@@ -53,7 +53,7 @@ class LogicGate:
         result = '{}'.format(' and '.join(components))
         return wrap(components, result)
 
-    def __str__(self):
+    def expand(self, *args):
         masks = self.input_masks
         components = [self.or_component(mask) for mask in masks]
         result = ' or '.join(components)

@@ -5,5 +5,5 @@ filename = argv[1]
 
 e = E()
 with open(filename) as f:
-    e.parse(f.read())
+    e.parse(f.read(), print)
     print(e.extract_all())
