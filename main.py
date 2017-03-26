@@ -4,7 +4,8 @@ from blifparse import Parser
 def main(filename):
     p = Parser()
     with open(filename) as f:
-        p.parse(f)
+        parseResult = p.parse(f)
+    print(parseResult.dump())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse blif file.')
@@ -14,4 +15,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
     filename = args.filename
     main(filename)
-

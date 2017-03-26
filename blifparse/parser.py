@@ -1,6 +1,17 @@
 from pyparsing import Word, OneOrMore, Suppress, alphanums, alphas
 from pyparsing import StringEnd, Optional, ParserElement, Group
 
+class BitParser():
+    def __init__(self, token):
+        self.bits = token[0].split('')
+
+    def parse(self, bit):
+        try: return bool(int(bit))
+        except: return None
+
+    def parse_bits(self):
+        return [self.parse(bit) for bit in self.bits]
+
 class Parser():
     def parse(self, f):
         is_valuable_line = lambda l: len(l) > 0 and l[0] != '#'
