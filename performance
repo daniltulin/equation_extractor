@@ -1,1 +1,1 @@
-echo $(time python3 main.py blifs/clma.blif >> /dev/null) >> ranking.log
+time python3 main.py blifs/clma.blif
