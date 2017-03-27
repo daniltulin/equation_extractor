@@ -7,7 +7,7 @@ files = [f for f in listdir('blifs') if isfile(join('blifs', f))]
 for f in files:
     try:
         main('blifs/' + f)
-    except Exception as e:
         qty += 1
+    except Exception as e:
         print(f, e)
 print(qty)
