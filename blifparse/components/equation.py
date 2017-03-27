@@ -4,6 +4,7 @@ class Variable():
     def __init__(self, name):
         self.name = name
         self.dep = None
+        self.equation = None
 
     def __repr__(self):
         return "Var: '" + self.name + "'"
@@ -11,8 +12,10 @@ class Variable():
     def __eq__(self, rhs):
         return self.name == rhs.name
 
-    def equation(self):
-        return self.dep.equation_for(self.name)
+    def get_equation(self):
+        if self.equation is None:
+            self.equation = self.dep.equation_for(self.name)
+        return self.equation
 
     @staticmethod
     def Factory(tokens):
@@ -22,7 +25,7 @@ class InputVariable(Variable):
     def __repr__(self):
         return 'Input' + Variable.__repr__(self)
 
-    def equation(self):
+    def get_equation(self):
         return Equation(self)
 
     @staticmethod
@@ -34,7 +37,7 @@ class ConstantVariable(Variable):
         self.name = name
         self.value = value
 
-    def equation(self):
+    def get_equation(self):
         return Equation(self)
 
     def __repr__(self):
@@ -96,7 +99,7 @@ class Equation:
         if self.policy is None:
             name = self.variable.name
             if name in mapping:
-                return mapping[self.variable.name].equation()
+                return mapping[self.variable.name].get_equation()
         else:
             self.inputs = set()
             for i, pair in enumerate(self.components):

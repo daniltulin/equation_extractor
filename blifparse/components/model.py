@@ -54,7 +54,7 @@ class Model():
             self.build_deps(input_var)
 
     def equation(self):
-        return {var.name: var.equation() for var in self.outputs.values()}
+        return {var.name: var.get_equation() for var in self.outputs.values()}
 
     def __repr__(self):
         properties = [self.inputs.values(), self.input_variables.values(),

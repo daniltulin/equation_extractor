@@ -26,7 +26,7 @@ class LibraryGate():
         actual_input = {var.name: var for var in self.inputs}
         mapping = {rev_assignments[name]: actual
                    for name, actual in actual_input.items()}
-        return formal_output.equation().substitute(mapping)
+        return formal_output.get_equation().substitute(mapping)
 
     def __repr__(self):
         return 'Library gate: ' + self.model_name + ', ' +\

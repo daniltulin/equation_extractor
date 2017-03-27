@@ -20,7 +20,7 @@ class LogicGate():
                       for bit, input_var in zip(mask, self.inputs)
                       if not bit.value is None]
         for bit, var in components:
-            equation.AND(var.equation(), bit)
+            equation.AND(var.get_equation(), bit)
         return equation
 
     def equation_for(self, variable_name):
