@@ -8,6 +8,14 @@ class Bit():
         except:
             return '-'
 
+    def __bool__(self):
+        if not self.value is None:
+            return self.value
+        raise Exception('Bit is None')
+
+    def __eq__(self, rhs):
+        return bool(self) == rhs
+
     @staticmethod
     def Factory(tokens):
         try:

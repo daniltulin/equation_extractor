@@ -54,6 +54,7 @@ class Equation:
         self.components = None
         self.policy =  None
         self.representation = None
+        self.value = None
 
     def append(self, rhs, bit, policy):
         pair = (bit, rhs)
@@ -81,7 +82,7 @@ class Equation:
             return variable.name
         joiner = ' || ' if self.policy == Policy.OR else ' && '
         def build(b, e):
-            neg = '!' if b else ''
+            neg = '' if b else '!'
             return neg + repr(e)
         components = [build(b, e) for b, e in self.components]
         def wrap(x):
@@ -105,16 +106,22 @@ class Equation:
                 self.inputs |= equation.inputs
         return self
 
-    def evaluate(self, mapping):
+    def __evaluate__(self, mapping):
         variable = self.variable
         if not variable is None:
             if isinstance(variable, ConstantVariable):
                 return variable.value
             return mapping[variable.name]
         for bit, equation in self.components:
+            value = equation.evaluate(mapping)
             if self.policy == Policy.AND:
-                if bit != equation.evaluate(mapping):
+                if bit != value:
                     return False
-            elif bit == equation.evaluate(mapping):
+            elif bit == value:
                 return True
-        return True
+        return self.policy == Policy.AND
+
+    def evaluate(self, mapping):
+        if self.value is None:
+            self.value = self.__evaluate__(mapping)
+        return self.value

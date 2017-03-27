@@ -18,7 +18,7 @@ class LogicGate():
         equation = Equation()
         components = [(bit, input_var)\
                       for bit, input_var in zip(mask, self.inputs)
-                      if not bit is None]
+                      if not bit.value is None]
         for bit, var in components:
             equation.AND(var.equation(), bit)
         return equation

@@ -8,6 +8,7 @@ for f in files:
     try:
         main('blifs/' + f)
         qty += 1
+        print(f)
     except Exception as e:
         print(f, e)
 print(qty)
