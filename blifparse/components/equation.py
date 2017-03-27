@@ -1,4 +1,5 @@
 from enum import Enum
+from copy import deepcopy
 
 class Variable():
     def __init__(self, name):
@@ -63,6 +64,7 @@ class Equation:
         pair = (bit, rhs)
         components = self.components
         if components is None:
+            self.variable = None
             self.policy = policy
             self.components = [pair]
             self.inputs = rhs.inputs
@@ -95,7 +97,7 @@ class Equation:
         self.representation = wrap(joiner.join(components))
         return self.representation
 
-    def substitute(self, mapping):
+    def __substitute__(self, mapping):
         if self.policy is None:
             name = self.variable.name
             if name in mapping:
@@ -104,10 +106,14 @@ class Equation:
             self.inputs = set()
             for i, pair in enumerate(self.components):
                 bit, component = pair
-                equation = component.substitute(mapping)
+                equation = component.__substitute__(mapping)
                 self.components[i] = (bit, equation)
                 self.inputs |= equation.inputs
         return self
+
+    def substituted(self, mapping):
+        copied = deepcopy(self)
+        return copied.__substitute__(mapping)
 
     def __evaluate__(self, mapping):
         variable = self.variable
@@ -116,7 +122,7 @@ class Equation:
                 return variable.value
             return mapping[variable.name]
         for bit, equation in self.components:
-            value = equation.evaluate(mapping)
+            value = equation.evaluate(mapping, False)
             if self.policy == Policy.AND:
                 if bit != value:
                     return False
@@ -124,7 +130,18 @@ class Equation:
                 return True
         return self.policy == Policy.AND
 
-    def evaluate(self, mapping):
+    def evaluate(self, mapping, cleanup=True):
+        if cleanup:
+            self.cleanup()
+
         if self.value is None:
             self.value = self.__evaluate__(mapping)
         return self.value
+
+    def cleanup(self):
+        variable = self.variable
+        if not variable is None:
+            variable.equation = None
+        else:
+            for _, equation in self.components:
+                equation.cleanup()
