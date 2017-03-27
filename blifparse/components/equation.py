@@ -104,3 +104,17 @@ class Equation:
                 self.components[i] = (bit, equation)
                 self.inputs |= equation.inputs
         return self
+
+    def evaluate(self, mapping):
+        variable = self.variable
+        if not variable is None:
+            if isinstance(variable, ConstantVariable):
+                return variable.value
+            return mapping[variable.name]
+        for bit, equation in self.components:
+            if self.policy == Policy.AND:
+                if bit != equation.evaluate(mapping):
+                    return False
+            elif bit == equation.evaluate(mapping):
+                return True
+        return True
