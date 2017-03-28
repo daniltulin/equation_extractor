@@ -50,9 +50,9 @@ class Policy(Enum):
 
 class Equation:
     def __init__(self, variable=None):
-        self.inputs = None
+        self.inputs = set()
         self.variable = variable
-        if not variable is None:
+        if not variable is None and not isinstance(variable, ConstantVariable):
             self.inputs = {variable.name}
 
         self.components = None
@@ -139,6 +139,7 @@ class Equation:
         return self.value
 
     def cleanup(self):
+        self.value = None
         variable = self.variable
         if not variable is None:
             variable.equation = None
