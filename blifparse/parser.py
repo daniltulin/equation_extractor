@@ -1,5 +1,5 @@
-from pyparsing import Word, OneOrMore, Suppress, alphanums, alphas
-from pyparsing import StringEnd, Optional, ParserElement, Group
+from .pyparsing import Word, OneOrMore, Suppress, alphanums, alphas
+from .pyparsing import StringEnd, Optional, ParserElement, Group
 
 from .components import LogicGate, LibraryGate, Variable, InputVariable,\
                         ConstantVariable, Bit, Bits, Latch, Model
