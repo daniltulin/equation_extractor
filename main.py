@@ -7,7 +7,7 @@ def get_binary(x, size):
     representation = '{:b}'.format(x).rjust(size, '0')
     return [bool(int(s)) for s in reversed(representation)]
 
-class CorelationFinder:
+class CorrelationFinder:
     def __init__(self, model):
         self.inputs = model.inputs.keys()
         self.equations = model.equation().items()
@@ -44,7 +44,7 @@ def main(filename):
             print(model.name, 'contains sequintial sequential circuit(s)')
             continue
         print(model.name, 'correlation:',
-              CorelationFinder(model).find_correlation())
+              CorrelationFinder(model).find_correlation())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse blif file.')
