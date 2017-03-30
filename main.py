@@ -22,6 +22,7 @@ class CorrelationFinder:
             mapping = {l: b for l, b in zip(inputs, binary)}
             value = equation.evaluate(mapping)
             table[i] += value
+        print([(get_binary(i, size), table[i]) for i in range(size)])
         return table
 
     def find_correlation(self):
