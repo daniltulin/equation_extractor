@@ -51,7 +51,7 @@ class Parser():
         formal_actual = Group(plain_name('formal') + Suppress('=') +
                               plain_name('actual'))
         assignments = Group(OneOrMore(formal_actual))
-        library_gate = (Suppress('.gate') | Suppress(' .subckt')) +\
+        library_gate = (Suppress('.gate') | Suppress('.subckt')) +\
                        plain_name('model_name') + assignments('assignments')
         library_gate.setParseAction(LibraryGate.Factory)
 
